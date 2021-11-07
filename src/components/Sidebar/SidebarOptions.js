@@ -1,7 +1,7 @@
 import React from "react";
 import useStyles from "./styles";
 
-import { ListItem, ListItemIcon, ListItemText } from "@material-ui/core";
+import { ListItem, } from "@material-ui/core";
 
 function SidebarOptions({ title, Icon }) {
     const classes = useStyles();

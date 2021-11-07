@@ -4,7 +4,7 @@ export default makeStyles((theme) => ({
     footer: {
         position: "fixed",
         display: "flex",
-        justifyContent: " space-between",
+        justifyContent: "space-between",
         alignItems: "center",
         bottom: 0,
         padding: 20,

@@ -16,10 +16,8 @@ import {
 
 function Sidebar() {
     const classes = useStyles();
-    const [{ playlists }, dispatch] = useStateValue();
-
-    console.log("PLAYLISTS >>> ", playlists);
-
+    const [{ playlists }] = useStateValue();
+    
     return (
         <div className={classes.sidebar}>
             <div className={classes.logotype_box}>

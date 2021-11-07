@@ -9,8 +9,7 @@ export const initialState = {
 };
 
 function stateReducer(state, action) {
-    console.log("REDUCER: ", action);
-
+    
     switch (action.type) {
         case "SET_USER":
             return {
@@ -28,6 +27,12 @@ function stateReducer(state, action) {
             return {
                 ...state,
                 playlists: action.playlists,
+            };
+
+        case "SET_DISCOVER_WEEKLY":
+            return {
+                ...state,
+                discover_weekly: action.discover_weekly,
             };
 
         default:
