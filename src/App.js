@@ -1,61 +1,99 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { useStateValue } from "./context/stateProvider";
 
 import PlayerPage from "./pages/Player/Player";
-
 import LoginPage from "./pages/Login/Login";
+
+import PrivateRoute from "./components/Routes/PrivateRoute";
+import PublicRoute from "./components/Routes/PublicRoute";
 
 import { getTokenFromResponse } from "./components/SpotifyAuth/Spotify";
 
 import SpotifyWebApi from "spotify-web-api-js";
+import Cookies from "js-cookie";
+
+import { Routes, Route } from "react-router-dom";
+import { CircularProgress } from "@material-ui/core";
+
+import Playlist from "./components/Playlist/Playlist";
 
 var spotify = new SpotifyWebApi();
 
 function App() {
-    const [{ token }, dispatch] = useStateValue();
+  const [{}, dispatch] = useStateValue();
 
-    useEffect(() => {
-        const hash = getTokenFromResponse();
+  const [isLoading, setIsLoading] = useState("");
 
-        const _token = hash.access_token;
+  useEffect(() => {
+    const hash = getTokenFromResponse();
 
-        if (_token) {
-            spotify.setAccessToken(_token);
+    const _token = hash.access_token;
+    const token = Cookies.get("token");
 
-            dispatch({
-                type: "SET_TOKEN",
-                token: _token,
-            });
+    if (_token !== undefined) {
+      Cookies.set("token", _token);
+      setIsLoading(true);
+      window.location.reload();
+    }
 
-            spotify.getMe().then((user) => {
-                dispatch({
-                    type: "SET_USER",
-                    user: user,
-                });
-            });
+    if (token) {
+      spotify.setAccessToken(token);
 
-            spotify.getUserPlaylists().then((playlists) => {
-                dispatch({
-                    type: "SET_PLAYLISTS",
-                    playlists: playlists,
-                });
-            });
+      spotify.getMe().then((user) => {
+        dispatch({
+          type: "SET_USER",
+          user: user,
+        });
+      });
 
-            spotify
-                .getPlaylist("1JnGYTfDZKBznWrY0arWjh")
-                .then((reponse) => {
-                    dispatch({
-                        type: "SET_DISCOVER_WEEKLY",
-                        discover_weekly: reponse,
-                    });
-                });
+      spotify.getUserPlaylists().then((playlists) => {
+        dispatch({
+          type: "SET_PLAYLISTS",
+          playlists: playlists,
+        });
+      });
+    }
+  }, []);
+
+  return !isLoading ? (
+    <Routes> 
+      <Route
+        path="/"
+        element={
+          <PublicRoute redirectTo="/player">
+            <LoginPage />
+          </PublicRoute>
         }
-    }, []);
+      />
 
-    return (
-        <div>{token ? <PlayerPage spotify={spotify} /> : <LoginPage />}</div>
-    );
+      <Route
+        path="/login"
+        element={
+          <PublicRoute redirectTo="/player">
+            <LoginPage />
+          </PublicRoute>
+        }
+      />
+
+      <Route
+        path="/player"
+        element={
+          <PrivateRoute redirectTo="/login">
+            <PlayerPage spotify={spotify} />
+          </PrivateRoute>
+        }
+      >
+        <Route path="/player/playlist/:id" element={<Playlist />} />
+      </Route>
+
+      <Route path="*" element={<h1>Page Not Found</h1>} />
+    </Routes>
+  ) : (
+    <div style={{ textAlign: "center" }}>
+      <CircularProgress size={140} />
+    </div>
+  );
 }
 
 export default App;

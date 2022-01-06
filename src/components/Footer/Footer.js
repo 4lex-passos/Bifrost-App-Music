@@ -3,9 +3,6 @@ import useStyles from "./styles";
 
 import {
     Box,
-    Card,
-    CardContent,
-    CardMedia,
     IconButton,
     LinearProgress,
     Slider,
